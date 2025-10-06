@@ -1,0 +1,59 @@
+name: Android APK Builds
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-variants:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - variant: debug
+            build-command: flutter build apk --debug
+            artifact-path: build/app/outputs/flutter-apk/app-debug.apk
+          - variant: profile
+            build-command: flutter build apk --profile
+            artifact-path: build/app/outputs/flutter-apk/app-profile.apk
+          - variant: release
+            build-command: flutter build apk --release --split-per-abi
+            artifact-path: build/app/outputs/flutter-apk
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Flutter format check
+        run: flutter format --set-exit-if-changed .
+
+      - name: Flutter analyze
+        run: flutter analyze
+
+      - name: Build ${{ matrix.variant }} APK
+        run: ${{ matrix.build-command }}
+
+      - name: List build outputs
+        run: ls -R build/app/outputs/flutter-apk
+
+      - name: Upload ${{ matrix.variant }} artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.variant }}-apk
+          path: ${{ matrix.artifact-path }}
+          if-no-files-found: error
