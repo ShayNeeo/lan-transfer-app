@@ -41,13 +41,13 @@ class LANFileServer {
     router.get('/', _handleMainPage);
     router.get('/index.html', _handleMainPage);
 
-  // API endpoints
-  router.get('/files', _handleFileList);
-  // Allow nested paths (including slashes) in parameters using regex capture
-  router.get('/download/<filename|.*>', _handleDownload);
-  router.get('/download-folder/<folderpath|.*>', _handleFolderDownload);
-  router.get('/delete/<filename|.*>', _handleDelete);
-  router.post('/upload', _handleUpload);
+    // API endpoints
+    router.get('/files', _handleFileList);
+    // Allow nested paths (including slashes) in parameters using regex capture
+    router.get('/download/<filename|.*>', _handleDownload);
+    router.get('/download-folder/<folderpath|.*>', _handleFolderDownload);
+    router.get('/delete/<filename|.*>', _handleDelete);
+    router.post('/upload', _handleUpload);
 
     final handler = const shelf.Pipeline()
         .addMiddleware(shelf.logRequests())
@@ -74,29 +74,35 @@ class LANFileServer {
   Future<shelf.Response> _handleFileList(shelf.Request request) async {
     try {
       final files = <Map<String, dynamic>>[];
-      
+
       // Get path parameter for subfolder navigation (within uploadDir only)
       final path = request.url.queryParameters['path'] ?? '';
       final targetPath = path.isEmpty
           ? uploadDir.path
           : p.normalize(p.join(uploadDir.path, path));
       final rootPath = uploadDir.path;
-      final isAllowed = targetPath == rootPath || p.isWithin(rootPath, targetPath);
+      final isAllowed =
+          targetPath == rootPath || p.isWithin(rootPath, targetPath);
       if (!isAllowed) {
         return shelf.Response.forbidden(
-          json.encode({'items': [], 'currentPath': path, 'error': 'Access denied'}),
+          json.encode(
+              {'items': [], 'currentPath': path, 'error': 'Access denied'}),
           headers: {'Content-Type': 'application/json'},
         );
       }
       final targetDir = Directory(targetPath);
-      
+
       if (!await targetDir.exists()) {
         return shelf.Response.notFound(
-          json.encode({'items': [], 'currentPath': path, 'error': 'Directory not found'}),
+          json.encode({
+            'items': [],
+            'currentPath': path,
+            'error': 'Directory not found'
+          }),
           headers: {'Content-Type': 'application/json'},
         );
       }
-      
+
       // List only direct children, not recursive
       await for (final entity in targetDir.list(recursive: false)) {
         final name = p.basename(entity.path);
@@ -121,7 +127,7 @@ class LANFileServer {
           });
         }
       }
-      
+
       // Sort: folders first, then files, alphabetically
       files.sort((a, b) {
         if (a['type'] != b['type']) {
@@ -129,14 +135,18 @@ class LANFileServer {
         }
         return a['name']!.compareTo(b['name']!);
       });
-      
+
       return shelf.Response.ok(
         json.encode({'items': files, 'currentPath': path}),
         headers: {'Content-Type': 'application/json'},
       );
     } catch (e) {
       return shelf.Response.internalServerError(
-        body: json.encode({'items': [], 'currentPath': request.url.queryParameters['path'] ?? '', 'error': 'Error listing files: $e'}),
+        body: json.encode({
+          'items': [],
+          'currentPath': request.url.queryParameters['path'] ?? '',
+          'error': 'Error listing files: $e'
+        }),
         headers: {'Content-Type': 'application/json'},
       );
     }
@@ -159,7 +169,8 @@ class LANFileServer {
       final bytes = await file.readAsBytes();
       // Extract just the filename for Content-Disposition
       final displayName = p.basename(filename);
-      final mimeType = lookupMimeType(displayName) ?? 'application/octet-stream';
+      final mimeType =
+          lookupMimeType(displayName) ?? 'application/octet-stream';
 
       return shelf.Response.ok(
         bytes,
@@ -188,7 +199,7 @@ class LANFileServer {
       }
 
       final archive = arch.Archive();
-      
+
       // Collect all files
       final files = <File>[];
       await for (final entity in folder.list(recursive: true)) {
@@ -196,7 +207,7 @@ class LANFileServer {
           files.add(entity);
         }
       }
-      
+
       // Add files to archive with better performance
       const batchSize = 50;
       for (int i = 0; i < files.length; i += batchSize) {
@@ -221,21 +232,24 @@ class LANFileServer {
       // Encode to zip
       final zipBytes = arch.ZipEncoder().encode(archive);
       if (zipBytes == null) {
-        return shelf.Response.internalServerError(body: 'Failed to create zip archive');
+        return shelf.Response.internalServerError(
+            body: 'Failed to create zip archive');
       }
 
       final folderName = folderpath.split('/').last;
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      
+
       return shelf.Response.ok(
         zipBytes,
         headers: {
           'Content-Type': 'application/zip',
-          'Content-Disposition': 'attachment; filename="$folderName-$timestamp.zip"',
+          'Content-Disposition':
+              'attachment; filename="$folderName-$timestamp.zip"',
         },
       );
     } catch (e) {
-      return shelf.Response.internalServerError(body: 'Error creating folder archive: $e');
+      return shelf.Response.internalServerError(
+          body: 'Error creating folder archive: $e');
     }
   }
 
@@ -243,15 +257,15 @@ class LANFileServer {
       shelf.Request request, String filename) async {
     try {
       final safePath = p.normalize(p.join(uploadDir.path, filename));
-      
+
       // Security check
       if (!p.isWithin(uploadDir.path, safePath)) {
         return shelf.Response.forbidden('Access denied');
       }
-      
+
       final file = File(safePath);
       final dir = Directory(safePath);
-      
+
       if (await file.exists()) {
         await file.delete();
         return shelf.Response.ok('File deleted successfully');
@@ -269,7 +283,8 @@ class LANFileServer {
   Future<shelf.Response> _handleUpload(shelf.Request request) async {
     try {
       final contentType = request.headers['content-type'];
-      if (contentType == null || !contentType.startsWith('multipart/form-data')) {
+      if (contentType == null ||
+          !contentType.startsWith('multipart/form-data')) {
         return shelf.Response.badRequest(body: 'Invalid content type');
       }
 
@@ -282,7 +297,8 @@ class LANFileServer {
           boundary = boundary.substring(1, boundary.length - 1);
         }
       } else {
-        return shelf.Response.badRequest(body: 'No boundary found in content-type');
+        return shelf.Response.badRequest(
+            body: 'No boundary found in content-type');
       }
 
       final boundaryBytes = utf8.encode('--$boundary');
@@ -326,7 +342,7 @@ class LANFileServer {
         final headerBytes = bytes.sublist(i, headersEnd);
         final headers = utf8.decode(headerBytes);
         print('Headers: $headers');
-        
+
         final filenameMatch = RegExp(r'filename="([^"]+)"').firstMatch(headers);
 
         if (filenameMatch == null) {
@@ -354,7 +370,9 @@ class LANFileServer {
 
         // Extract file data (remove trailing \r\n before boundary)
         int dataEnd = nextBoundaryIndex;
-        if (dataEnd >= 2 && bytes[dataEnd - 2] == 13 && bytes[dataEnd - 1] == 10) {
+        if (dataEnd >= 2 &&
+            bytes[dataEnd - 2] == 13 &&
+            bytes[dataEnd - 1] == 10) {
           dataEnd -= 2;
         }
 
@@ -387,14 +405,16 @@ class LANFileServer {
       print('Total files uploaded: $uploadedCount');
 
       if (uploadedCount > 0) {
-        return shelf.Response.ok('$uploadedCount file(s) uploaded successfully');
+        return shelf.Response.ok(
+            '$uploadedCount file(s) uploaded successfully');
       } else {
         return shelf.Response.badRequest(body: 'No files uploaded');
       }
     } catch (e, stackTrace) {
       print('Upload error: $e');
       print('Stack trace: $stackTrace');
-      return shelf.Response.internalServerError(body: 'Error uploading files: $e');
+      return shelf.Response.internalServerError(
+          body: 'Error uploading files: $e');
     }
   }
 

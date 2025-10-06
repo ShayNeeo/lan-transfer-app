@@ -51,7 +51,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -82,7 +83,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
       body: TabBarView(
         controller: _tabController,
-        physics: const NeverScrollableScrollPhysics(), // Prevent accidental swipes
+        physics:
+            const NeverScrollableScrollPhysics(), // Prevent accidental swipes
         children: const [
           ClientPage(),
           ServerPage(),
@@ -100,7 +102,8 @@ class ServerPage extends StatefulWidget {
   State<ServerPage> createState() => _ServerPageState();
 }
 
-class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMixin {
+class _ServerPageState extends State<ServerPage>
+    with AutomaticKeepAliveClientMixin {
   String? _serverIp;
   bool _isStarting = false;
   List<FileInfo> _serverFiles = [];
@@ -148,12 +151,13 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
       final files = <FileInfo>[];
       if (await globalServer.uploadDir.exists()) {
         // Get all entities first, then process for better performance
-        final entities = await globalServer.uploadDir.list(recursive: false).toList();
-        
+        final entities =
+            await globalServer.uploadDir.list(recursive: false).toList();
+
         for (final entity in entities) {
           final name = p.basename(entity.path);
           if (name.startsWith('.')) continue; // Skip hidden files
-          
+
           if (entity is Directory) {
             files.add(FileInfo(
               name: name,
@@ -177,7 +181,7 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
           }
         }
       }
-      
+
       // Sort: folders first, then files (case-insensitive)
       files.sort((a, b) {
         if (a.type != b.type) {
@@ -185,7 +189,7 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
         }
         return a.name.toLowerCase().compareTo(b.name.toLowerCase());
       });
-      
+
       if (mounted) {
         setState(() {
           _serverFiles = files;
@@ -204,7 +208,7 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
       final files = <FileInfo>[];
       final folder = Directory('${globalServer.uploadDir.path}/$folderPath');
       if (!await folder.exists()) return files;
-      
+
       // List only direct children, not recursive
       await for (final entity in folder.list(recursive: false)) {
         final name = p.basename(entity.path);
@@ -255,12 +259,13 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
     final itemPath = '${globalServer.uploadDir.path}/$filepath';
     final isFolder = await Directory(itemPath).exists();
     final itemType = isFolder ? 'folder' : 'file';
-    
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Delete ${itemType == 'folder' ? 'Folder' : 'File'}'),
-        content: Text('Are you sure you want to delete this $itemType?${isFolder ? ' and all its contents?' : ''}'),
+        content: Text(
+            'Are you sure you want to delete this $itemType?${isFolder ? ' and all its contents?' : ''}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -289,20 +294,22 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
           await file.delete();
         }
       }
-      
+
       // Clear all caches and force immediate UI update
       setState(() {
         _folderContents.remove(filepath);
         _expandedFolders.remove(filepath);
         _serverFiles.removeWhere((f) => f.path == filepath);
       });
-      
+
       // Also reload from disk to ensure consistency
       await _loadServerFiles();
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${itemType == 'folder' ? 'Folder' : 'File'} deleted successfully')),
+          SnackBar(
+              content: Text(
+                  '${itemType == 'folder' ? 'Folder' : 'File'} deleted successfully')),
         );
       }
     } catch (e) {
@@ -346,14 +353,14 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
       // Create archive with better performance
       final archive = arch.Archive();
       final files = <FileSystemEntity>[];
-      
+
       // Collect all files first for better performance
       await for (final entity in folder.list(recursive: true)) {
         if (entity is File) {
           files.add(entity);
         }
       }
-      
+
       // Process files in batches to avoid memory issues
       const batchSize = 50;
       for (int i = 0; i < files.length; i += batchSize) {
@@ -375,11 +382,12 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
       final zipBytes = arch.ZipEncoder().encode(archive);
       if (zipBytes != null) {
         await zipFile.writeAsBytes(zipBytes);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Folder downloaded: ${files.length} files\nSaved to: ${zipFile.path}'),
+              content: Text(
+                  'Folder downloaded: ${files.length} files\nSaved to: ${zipFile.path}'),
               duration: const Duration(seconds: 5),
             ),
           );
@@ -437,7 +445,8 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                  icon:
+                      Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
                   onPressed: () async {
                     if (isExpanded) {
                       setState(() {
@@ -475,7 +484,8 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
                       padding: EdgeInsets.all(16.0),
                       child: Text(
                         'Empty folder',
-                        style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+                        style: TextStyle(
+                            color: Colors.grey, fontStyle: FontStyle.italic),
                       ),
                     )
                   : Column(
@@ -522,7 +532,9 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
             color: Colors.amber,
             size: 24,
           ),
-          title: Text(folder.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          title: Text(folder.name,
+              style:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           subtitle: Text(
             contents.isEmpty && !isExpanded
                 ? 'Folder'
@@ -573,10 +585,14 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
           }).toList(),
         if (isExpanded && contents.isEmpty)
           Padding(
-            padding: EdgeInsets.only(left: 16.0 * (depth + 2), top: 8, bottom: 8),
+            padding:
+                EdgeInsets.only(left: 16.0 * (depth + 2), top: 8, bottom: 8),
             child: const Text(
               'Empty folder',
-              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 12),
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 12),
             ),
           ),
       ],
@@ -613,7 +629,7 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
 
   Future<void> _toggleServer() async {
     setState(() => _isStarting = true);
-    
+
     try {
       if (globalServer.isRunning) {
         await globalServer.stop();
@@ -629,7 +645,7 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
         );
       }
     }
-    
+
     setState(() => _isStarting = false);
   }
 
@@ -652,12 +668,13 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
               Text(
                 globalServer.isRunning ? 'Server Running' : 'Server Stopped',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: globalServer.isRunning ? Colors.green : Colors.grey,
+                      color:
+                          globalServer.isRunning ? Colors.green : Colors.grey,
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 16),
-              
+
               // Server URL Card
               if (globalServer.isRunning && _serverIp != null)
                 Card(
@@ -681,45 +698,52 @@ class _ServerPageState extends State<ServerPage> with AutomaticKeepAliveClientMi
                         const SizedBox(height: 4),
                         Text(
                           globalServer.uploadDir.path,
-                          style: const TextStyle(fontSize: 10, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 10, color: Colors.grey),
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
                 ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Start/Stop Button
               ElevatedButton.icon(
                 onPressed: _isStarting ? null : _toggleServer,
-                icon: Icon(globalServer.isRunning ? Icons.stop : Icons.play_arrow),
+                icon: Icon(
+                    globalServer.isRunning ? Icons.stop : Icons.play_arrow),
                 label: Text(
                   _isStarting
                       ? 'Please wait...'
-                      : (globalServer.isRunning ? 'Stop Server' : 'Start Server'),
+                      : (globalServer.isRunning
+                          ? 'Stop Server'
+                          : 'Start Server'),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  backgroundColor:
-                      globalServer.isRunning ? Colors.red : const Color(0xFF667EEA),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  backgroundColor: globalServer.isRunning
+                      ? Colors.red
+                      : const Color(0xFF667EEA),
                   foregroundColor: Colors.white,
                 ),
               ),
             ],
           ),
         ),
-        
+
         const Divider(),
-        
+
         // Files Section
         Expanded(
           child: globalServer.isRunning
               ? Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -819,7 +843,8 @@ class ClientPage extends StatefulWidget {
   State<ClientPage> createState() => _ClientPageState();
 }
 
-class _ClientPageState extends State<ClientPage> with AutomaticKeepAliveClientMixin {
+class _ClientPageState extends State<ClientPage>
+    with AutomaticKeepAliveClientMixin {
   final TextEditingController _serverController = TextEditingController();
   List<FileInfo> _files = [];
   bool _isLoading = false;
@@ -872,12 +897,13 @@ class _ClientPageState extends State<ClientPage> with AutomaticKeepAliveClientMi
 
     try {
       final response = await http.get(Uri.parse('$_serverUrl/files')).timeout(
-        const Duration(seconds: 10),
-      );
+            const Duration(seconds: 10),
+          );
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        final List<dynamic> data = responseData is Map ? responseData['items'] ?? [] : responseData;
+        final List<dynamic> data =
+            responseData is Map ? responseData['items'] ?? [] : responseData;
         setState(() {
           _files = data.map((f) => FileInfo.fromJson(f)).toList();
           _isLoading = false;
@@ -1000,7 +1026,8 @@ class _ClientPageState extends State<ClientPage> with AutomaticKeepAliveClientMi
         String relativePath = file.path.substring(directoryPath.length + 1);
         String fullPath = '$folderName/$relativePath';
         request.files.add(
-          await http.MultipartFile.fromPath('files', file.path, filename: fullPath),
+          await http.MultipartFile.fromPath('files', file.path,
+              filename: fullPath),
         );
       }
 
@@ -1013,7 +1040,8 @@ class _ClientPageState extends State<ClientPage> with AutomaticKeepAliveClientMi
       });
 
       if (response.statusCode == 200) {
-        _showStatus('${files.length} file(s) from folder uploaded successfully!');
+        _showStatus(
+            '${files.length} file(s) from folder uploaded successfully!');
         _loadFiles();
       } else {
         _showStatus('Upload failed', isError: true);
@@ -1050,7 +1078,7 @@ class _ClientPageState extends State<ClientPage> with AutomaticKeepAliveClientMi
         if (!await parentDir.exists()) {
           await parentDir.create(recursive: true);
         }
-        
+
         await file.writeAsBytes(response.bodyBytes);
         _showStatus('Downloaded to: ${file.path}');
       } else {
@@ -1151,16 +1179,15 @@ class _ClientPageState extends State<ClientPage> with AutomaticKeepAliveClientMi
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isError
-                    ? Colors.red.shade100
-                    : Colors.green.shade100,
+                color: _isError ? Colors.red.shade100 : Colors.green.shade100,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   Icon(
                     _isError ? Icons.error : Icons.check_circle,
-                    color: _isError ? Colors.red.shade700 : Colors.green.shade700,
+                    color:
+                        _isError ? Colors.red.shade700 : Colors.green.shade700,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -1288,7 +1315,7 @@ class FileInfo {
   final String path;
 
   FileInfo({
-    required this.name, 
+    required this.name,
     required this.size,
     this.type = 'file',
     this.path = '',
