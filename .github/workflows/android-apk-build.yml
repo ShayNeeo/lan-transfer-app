@@ -26,12 +26,11 @@ jobs:
 
       - name: Install Android SDK components
         run: |
-          yes | sdkmanager --install \
+          yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" \
+            --install \
             "platforms;android-35" \
             "build-tools;35.0.0" \
             "ndk;27.0.12077973"
-        env:
-          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Flutter pub get
         run: flutter pub get
