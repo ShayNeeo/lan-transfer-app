@@ -140,11 +140,3 @@ If you'd like, I can add a template CI step to handle secure keystore injection 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-If you want, I can:
-- Create this [`README.md`](README.md ) in your repo for you,
-- Add a CI step for keystore injection and signing,
-- Add an example `key.properties.template` and a short script that populates it from GitHub Secrets.
-Which of those would you like next?
