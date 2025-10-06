@@ -108,8 +108,8 @@ class _ServerPageState extends State<ServerPage>
   bool _isStarting = false;
   List<FileInfo> _serverFiles = [];
   bool _isLoadingFiles = false;
-  Map<String, List<FileInfo>> _folderContents = {};
-  Set<String> _expandedFolders = {};
+  final Map<String, List<FileInfo>> _folderContents = {};
+  final Set<String> _expandedFolders = {};
 
   // Keep state alive when switching tabs
   @override
@@ -258,6 +258,9 @@ class _ServerPageState extends State<ServerPage>
   Future<void> _deleteServerFile(String filepath) async {
     final itemPath = '${globalServer.uploadDir.path}/$filepath';
     final isFolder = await Directory(itemPath).exists();
+
+    if (!mounted) return;
+
     final itemType = isFolder ? 'folder' : 'file';
 
     final confirm = await showDialog<bool>(
@@ -305,19 +308,19 @@ class _ServerPageState extends State<ServerPage>
       // Also reload from disk to ensure consistency
       await _loadServerFiles();
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  '${itemType == 'folder' ? 'Folder' : 'File'} deleted successfully')),
-        );
-      }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                '${itemType == 'folder' ? 'Folder' : 'File'} deleted successfully')),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting $itemType: $e')),
-        );
-      }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting $itemType: $e')),
+      );
     }
   }
 
@@ -383,28 +386,29 @@ class _ServerPageState extends State<ServerPage>
       if (zipBytes != null) {
         await zipFile.writeAsBytes(zipBytes);
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  'Folder downloaded: ${files.length} files\nSaved to: ${zipFile.path}'),
-              duration: const Duration(seconds: 5),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
+        if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error downloading folder: $e')),
+          SnackBar(
+            content: Text(
+                'Folder downloaded: ${files.length} files\nSaved to: ${zipFile.path}'),
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error downloading folder: $e')),
+      );
     }
   }
 
   Future<void> _openFile(String filename) async {
     final file = File('${globalServer.uploadDir.path}/$filename');
     if (await file.exists()) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('File: ${file.path}')),
       );
@@ -489,13 +493,13 @@ class _ServerPageState extends State<ServerPage>
                       ),
                     )
                   : Column(
-                      children: contents.map((item) {
-                        if (item.type == 'folder') {
-                          return _buildNestedFolderTile(item, depth: depth + 1);
-                        } else {
-                          return _buildNestedFileTile(item, depth: depth + 1);
-                        }
-                      }).toList(),
+                      children: [
+                        for (final item in contents)
+                          if (item.type == 'folder')
+                            _buildNestedFolderTile(item, depth: depth + 1)
+                          else
+                            _buildNestedFileTile(item, depth: depth + 1),
+                      ],
                     ),
             ),
         ],
@@ -575,14 +579,13 @@ class _ServerPageState extends State<ServerPage>
             ],
           ),
         ),
-        if (isExpanded && contents.isNotEmpty)
-          ...contents.map((item) {
-            if (item.type == 'folder') {
-              return _buildNestedFolderTile(item, depth: depth + 1);
-            } else {
-              return _buildNestedFileTile(item, depth: depth + 1);
-            }
-          }).toList(),
+        if (isExpanded && contents.isNotEmpty) ...[
+          for (final item in contents)
+            if (item.type == 'folder')
+              _buildNestedFolderTile(item, depth: depth + 1)
+            else
+              _buildNestedFileTile(item, depth: depth + 1),
+        ],
         if (isExpanded && contents.isEmpty)
           Padding(
             padding:

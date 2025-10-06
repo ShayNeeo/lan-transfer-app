@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
@@ -223,7 +224,7 @@ class LANFileServer {
             ));
           } catch (e) {
             // Skip files that can't be read
-            print('Skipping file ${file.path}: $e');
+            developer.log('Skipping file ${file.path}: $e');
             continue;
           }
         }
@@ -304,8 +305,8 @@ class LANFileServer {
       final boundaryBytes = utf8.encode('--$boundary');
       final bytes = await request.read().expand((chunk) => chunk).toList();
 
-      print('Received ${bytes.length} bytes for upload');
-      print('Boundary: --$boundary (${boundaryBytes.length} bytes)');
+      developer.log('Received ${bytes.length} bytes for upload');
+      developer.log('Boundary: --$boundary (${boundaryBytes.length} bytes)');
 
       int uploadedCount = 0;
       int i = 0;
@@ -341,30 +342,30 @@ class LANFileServer {
         // Parse headers to get filename
         final headerBytes = bytes.sublist(i, headersEnd);
         final headers = utf8.decode(headerBytes);
-        print('Headers: $headers');
+        developer.log('Headers: $headers');
 
         final filenameMatch = RegExp(r'filename="([^"]+)"').firstMatch(headers);
 
         if (filenameMatch == null) {
-          print('No filename found in headers');
+          developer.log('No filename found in headers');
           i = headersEnd + 4;
           continue;
         }
 
         final filename = filenameMatch.group(1);
         if (filename == null || filename.isEmpty) {
-          print('Empty filename');
+          developer.log('Empty filename');
           i = headersEnd + 4;
           continue;
         }
 
-        print('Processing file: $filename');
+        developer.log('Processing file: $filename');
 
         // Find next boundary
         int dataStart = headersEnd + 4;
         int nextBoundaryIndex = _findBoundary(bytes, boundaryBytes, dataStart);
         if (nextBoundaryIndex == -1) {
-          print('No next boundary found');
+          developer.log('No next boundary found');
           break;
         }
 
@@ -377,13 +378,13 @@ class LANFileServer {
         }
 
         final fileData = bytes.sublist(dataStart, dataEnd);
-        print('File data size: ${fileData.length} bytes');
+        developer.log('File data size: ${fileData.length} bytes');
 
         // Save file with binary data, creating directories if needed
         // Build a safe destination path within uploadDir
         final destPath = p.normalize(p.join(uploadDir.path, filename));
         if (!p.isWithin(uploadDir.path, destPath)) {
-          print('Skipping file outside upload directory: $filename');
+          developer.log('Skipping file outside upload directory: $filename');
           i = nextBoundaryIndex;
           continue;
         }
@@ -393,16 +394,16 @@ class LANFileServer {
         final parentDir = file.parent;
         if (!await parentDir.exists()) {
           await parentDir.create(recursive: true);
-          print('Created directory: ${parentDir.path}');
+          developer.log('Created directory: ${parentDir.path}');
         }
         await file.writeAsBytes(fileData);
-        print('Saved file: ${file.path}');
+        developer.log('Saved file: ${file.path}');
         uploadedCount++;
 
         i = nextBoundaryIndex;
       }
 
-      print('Total files uploaded: $uploadedCount');
+      developer.log('Total files uploaded: $uploadedCount');
 
       if (uploadedCount > 0) {
         return shelf.Response.ok(
@@ -411,8 +412,8 @@ class LANFileServer {
         return shelf.Response.badRequest(body: 'No files uploaded');
       }
     } catch (e, stackTrace) {
-      print('Upload error: $e');
-      print('Stack trace: $stackTrace');
+      developer.log('Upload error: $e');
+      developer.log('Stack trace: $stackTrace');
       return shelf.Response.internalServerError(
           body: 'Error uploading files: $e');
     }
