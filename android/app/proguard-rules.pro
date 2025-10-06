@@ -15,6 +15,10 @@
 # Network info
 -keep class dev.fluttercommunity.plus.network_info.** { *; }
 
+# Google Play Core (SplitCompat)
+-keep class com.google.android.play.** { *; }
+-dontwarn com.google.android.play.**
+
 # Keep all Dart classes
 -keep class **.** { *; }
 -dontwarn io.flutter.embedding.**

@@ -7,20 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build-variants:
+  build-release-splits:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - variant: debug
-            build-command: flutter build apk --debug
-            artifact-path: build/app/outputs/flutter-apk/app-debug.apk
-          - variant: profile
-            build-command: flutter build apk --profile
-            artifact-path: build/app/outputs/flutter-apk/app-profile.apk
-          - variant: release
-            build-command: flutter build apk --release --split-per-abi
-            artifact-path: build/app/outputs/flutter-apk
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +24,15 @@ jobs:
         with:
           flutter-version: '3.24.0'
 
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --install \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "ndk;27.0.12077973"
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
       - name: Flutter pub get
         run: flutter pub get
 
@@ -45,15 +42,29 @@ jobs:
       - name: Flutter analyze
         run: flutter analyze
 
-      - name: Build ${{ matrix.variant }} APK
-        run: ${{ matrix.build-command }}
+      - name: Build release split APKs
+        run: flutter build apk --release --split-per-abi
 
       - name: List build outputs
         run: ls -R build/app/outputs/flutter-apk
 
-      - name: Upload ${{ matrix.variant }} artifact
+      - name: Upload arm64-v8a APK
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.variant }}-apk
-          path: ${{ matrix.artifact-path }}
+          name: release-arm64-v8a
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          if-no-files-found: error
+
+      - name: Upload armeabi-v7a APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-armeabi-v7a
+          path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+          if-no-files-found: error
+
+      - name: Upload x86_64 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-x86_64
+          path: build/app/outputs/flutter-apk/app-x86_64-release.apk
           if-no-files-found: error

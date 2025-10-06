@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.lantransfer.lan_transfer_app"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -45,4 +45,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Required for SplitCompatApplication referenced by Flutter Play Store split support
+    implementation("com.google.android.play:core:1.10.3")
 }
