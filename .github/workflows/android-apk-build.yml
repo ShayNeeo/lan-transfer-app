@@ -4,8 +4,10 @@ on:
   push:
     branches: [main]
     tags: ['v1.0.0']
+    paths-ignore: ['README.md']  # Skip if only README.md changes
   pull_request:
     branches: [main]
+    paths-ignore: ['README.md']  # Skip if only README.md changes
 
 jobs:
   build-release-splits:
