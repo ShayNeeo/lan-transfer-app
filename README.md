@@ -1,6 +1,6 @@
 # Local Share
 
-![Build Status](https://github.com/<your-username>/localshare/actions/workflows/android-apk-build.yml/badge.svg)
+[![Android APK Builds](https://github.com/ShayNeeo/localshare/actions/workflows/android-apk-build.yml/badge.svg)](https://github.com/ShayNeeo/localshare/actions/workflows/android-apk-build.yml)
 [![Flutter](https://img.shields.io/badge/Flutter-3.24.0-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.0+-blue.svg)](https://dart.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
