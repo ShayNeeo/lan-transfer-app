@@ -1,4 +1,4 @@
-package com.lantransfer.lan_transfer_app
+package com.shayneoo.localshare
 
 import io.flutter.embedding.android.FlutterActivity
 
