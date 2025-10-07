@@ -25,7 +25,7 @@ class LANFileServer {
     // Setup upload directory in external storage (like normal APKs)
     final externalDir = await getExternalStorageDirectory();
     if (externalDir != null) {
-      // Use /storage/emulated/0/Android/data/com.shayneoo.localshare/files/uploads
+      // Use /storage/emulated/0/Android/data/com.shayneeo.localshare/files/uploads
       uploadDir = Directory('${externalDir.path}/uploads');
     } else {
       // Fallback to app directory if external storage not available

@@ -1,4 +1,4 @@
-package com.shayneoo.localshare
+package com.shayneeo.localshare
 
 import io.flutter.embedding.android.FlutterActivity
 
