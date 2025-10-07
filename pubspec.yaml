@@ -1,5 +1,5 @@
-name: lan_transfer_app
-description: "A Flutter app for LAN file transfer"
+name: localshare
+description: "A Flutter app for local file sharing"
 publish_to: 'none'
 version: 1.0.0+1
 

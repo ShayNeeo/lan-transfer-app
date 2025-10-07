@@ -14,16 +14,16 @@ import 'package:path/path.dart' as p;
 final globalServer = LANFileServer(port: 8000);
 
 void main() {
-  runApp(const LANTransferApp());
+  runApp(const LocalShareApp());
 }
 
-class LANTransferApp extends StatelessWidget {
-  const LANTransferApp({super.key});
+class LocalShareApp extends StatelessWidget {
+  const LocalShareApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'LAN File Transfer',
+      title: 'Local Share',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF667EEA),
@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('📁 LAN File Transfer'),
+        title: const Text('📁 Local Share'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         bottom: TabBar(
           controller: _tabController,

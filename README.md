@@ -1,12 +1,12 @@
 # Local Share
 
-[![Android APK Builds](https://github.com/ShayNeeo/lan-transfer-app/actions/workflows/android-apk-build.yml/badge.svg)](https://github.com/ShayNeeo/lan-transfer-app/actions/workflows/android-apk-build.yml)
+![Build Status](https://github.com/<your-username>/localshare/actions/workflows/android-apk-build.yml/badge.svg)
 [![Flutter](https://img.shields.io/badge/Flutter-3.24.0-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.0+-blue.svg)](https://dart.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Small Flutter app (LAN upload / transfer) — Android build/release pipeline included.
+Small Flutter app (local file sharing) — Android build/release pipeline included.
 
 ## What this repo contains
 
@@ -126,7 +126,7 @@ If you'd like, I can add a template CI step to handle secure keystore injection 
   - `release-armeabi-v7a`
   - `release-x86_64`
 
-- GitHub Release: when you push a version tag (e.g. `v1.0.1`) the `publish-release` job creates a Release and attaches the three APKs. Visit: `https://github.com/<your-username>/lan-transfer-app/releases`.
+- GitHub Release: when you push a version tag (e.g. `v1.0.1`) the `publish-release` job creates a Release and attaches the three APKs. Visit: `https://github.com/<your-username>/localshare/releases`.
 
 ---
 
