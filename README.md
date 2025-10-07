@@ -1,4 +1,4 @@
-# lan-transfer-app
+# Local Share
 
 [![Android APK Builds](https://github.com/ShayNeeo/lan-transfer-app/actions/workflows/android-apk-build.yml/badge.svg)](https://github.com/ShayNeeo/lan-transfer-app/actions/workflows/android-apk-build.yml)
 [![Flutter](https://img.shields.io/badge/Flutter-3.24.0-blue.svg)](https://flutter.dev/)
