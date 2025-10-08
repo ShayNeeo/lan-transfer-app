@@ -48,3 +48,17 @@ app.*.map.json
 android/key.properties
 **/*.jks
 **/*.keystore
+
+# local webpage build and dependencies
+/webpage/build
+/webpage/node_modules
+/webpage/.env
+/webpage/.env.*
+
+# ignore root favicon source folders (duplicates; public/ contains the used copies)
+/favicon_io/
+/favicon_io_transparent/
+/favicon_io_transparent.zip
+
+# backup JS copies for migration
+/webpage/backup-js/

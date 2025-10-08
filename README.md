@@ -52,91 +52,52 @@ flutter build apk --release --split-per-abi
 
 ---
 
-## CI / CD (GitHub Actions)
+## Website / Landing page
 
-Workflow location: `.github/workflows/android-apk-build.yml`
+This repository includes a small, static landing page for Local Share located in the `webpage/` folder. The site provides a quick introduction to the app and direct links for users to download the Android APK from the project's GitHub Releases. iOS support is marked "Coming soon." The website is intentionally styled in a black-and-white, retro look.
 
-Triggers:
-- Pushes to `main` will run the build job.
-- Pushing a tag that matches `v*.*.*` (example `v1.0.1`) will:
-  1. Run the build (same as above),
-  2. Then run the `publish-release` job which attaches the three ABI APKs to a GitHub Release named after the tag.
+What users will find on the landing page:
+- Logo and project title
+- Short introduction to Local Share
+- Android download button (links to GitHub Releases)
+- iOS button (Coming soon)
 
-Notes:
-- The workflow currently ignores README-only changes (so editing `README.md` alone won't re-run the build).
-- Workflow uses Flutter 3.24.0 on `ubuntu-latest` and installs Android SDK platform 35, build-tools 35.0.0 and NDK 27.0.12077973 in CI.
+Preview the website locally (for contributors or curious users):
 
-How to create a release (recommended):
-1. Commit and push your changes to `main`:
+```bash
+cd webpage
+npm install
+npm start
+# open http://localhost:3000
+```
+# Local Share
+
+Local Share is a simple, privacy-first app for transferring files between devices on the same local network. No accounts and no cloud storage — files are sent directly between devices on your LAN.
+
+Key highlights
+- Fast, local-only file transfers
+- No account required, no sign-in
+- Designed for ease: send/receive with a few taps
+
+Download
+- Android: APKs and releases available on GitHub Releases:
+   https://github.com/ShayNeeo/localshare/releases/
+- iOS: Coming soon
+
+How to use (high level)
+1. Install the Android app from Releases (or your device's Play Store if published).
+2. Connect both devices to the same Wi‑Fi or local network.
+3. Open Local Share, choose Send or Receive, and follow the on-screen instructions to transfer files.
+
+Privacy & Security
+- Transfers happen over your local network only. Files are not uploaded to any cloud service by the app.
+
+Support
+- Report bugs or request features via GitHub Issues:
+   https://github.com/ShayNeeo/localshare/issues
+
+License
+- MIT — see the `LICENSE` file in this repository for details.
+
+Thanks for trying Local Share!
    ```bash
-   git add .
-   git commit -m "Describe your changes"
-   git push
-   ```
-   (This will run the build job — helpful so you know it passes before tagging.)
-2. Create an annotated tag that will be used as the Release title/message:
-   ```bash
-   git tag -a v1.0.1 -m "release v1.0.1"
-   git push origin v1.0.1
-   ```
-   Pushing the tag triggers the workflow that will publish a GitHub Release and attach the APKs.
-
-If you want the release to be a draft (review before publishing), edit the workflow and set `draft: true` in the `softprops/action-gh-release` configuration.
-
----
-
-## Signing the release APKs
-
-This repo does not include any keystore or signing keys. To produce a signed release (recommended for Play Store/uploading):
-
-1. Generate an Android keystore (example):
-   ```bash
-   keytool -genkey -v -keystore ~/my-release-key.jks -alias app-key -keyalg RSA -keysize 2048 -validity 10000
-   ```
-2. Do NOT commit your keystore or `key.properties`. Add them to [`.gitignore`](.gitignore ) (the repo already ignores signing artifacts).
-3. Locally, set up `android/key.properties` with secure values:
-   ```
-   storePassword=<your-store-password>
-   keyPassword=<your-key-password>
-   keyAlias=app-key
-   storeFile=/absolute/path/to/my-release-key.jks
-   ```
-4. To sign in CI, store your keystore as an encrypted secret and modify the workflow to:
-   - Upload keystore into the runner at runtime (from `secrets`),
-   - Provide `key.properties` values via secrets (or create the file from secrets),
-   - Add Gradle signing configs that read `key.properties`.
-
-If you'd like, I can add a template CI step to handle secure keystore injection (requires you to create secrets in the repo).
-
----
-
-## Troubleshooting
-
-- R8 / missing classes (e.g., SplitCompatApplication): ensure [`android/app/build.gradle.kts`](android/app/build.gradle.kts ) uses `compileSdk = 35` and the appropriate `ndkVersion = "27.0.12077973"` when plugins request newer SDK/NDK.
-- CI failing to install Android SDK tools: the workflow calls the SDK manager from `${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager`.
-- Formatter or analyzer failures: run `dart format .` and `flutter analyze` locally to see and fix reported issues.
-- Permission error when publishing releases (HTTP 403): workflow needs `permissions: contents: write` at the job or workflow level — this repository’s workflow already sets that for the `publish-release` job.
-
----
-
-## Where to find build outputs
-
-- CI artifacts (if you run the build on GitHub Actions): open the workflow run → Jobs → `build-release-splits` → Artifacts. The three artifacts are named:
-  - `release-arm64-v8a`
-  - `release-armeabi-v7a`
-  - `release-x86_64`
-
-- GitHub Release: when you push a version tag (e.g. `v1.0.1`) the `publish-release` job creates a Release and attaches the three APKs. Visit: `https://github.com/<your-username>/localshare/releases`.
-
----
-
-## Contributing / PRs
-
-- Open a branch, create a PR against `main`.
-- CI runs on PRs targeting `main`. Only push tags to create Releases.
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
