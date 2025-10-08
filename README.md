@@ -34,42 +34,6 @@ flutter pub get
 ```
 
 Format and analyze:
-```bash
-dart format .
-flutter analyze
-```
-
-Run on device (debug):
-```bash
-flutter run
-```
-
-Build split release APKs locally:
-```bash
-flutter build apk --release --split-per-abi
-# Output APKs will be in build/app/outputs/flutter-apk/
-```
-
----
-
-## Website / Landing page
-
-This repository includes a small, static landing page for Local Share located in the `webpage/` folder. The site provides a quick introduction to the app and direct links for users to download the Android APK from the project's GitHub Releases. iOS support is marked "Coming soon." The website is intentionally styled in a black-and-white, retro look.
-
-What users will find on the landing page:
-- Logo and project title
-- Short introduction to Local Share
-- Android download button (links to GitHub Releases)
-- iOS button (Coming soon)
-
-Preview the website locally (for contributors or curious users):
-
-```bash
-cd webpage
-npm install
-npm start
-# open http://localhost:3000
-```
 # Local Share
 
 Local Share is a simple, privacy-first app for transferring files between devices on the same local network. No accounts and no cloud storage — files are sent directly between devices on your LAN.
@@ -89,6 +53,27 @@ How to use (high level)
 2. Connect both devices to the same Wi‑Fi or local network.
 3. Open Local Share, choose Send or Receive, and follow the on-screen instructions to transfer files.
 
+Website / Landing page
+This repository includes a small static landing page located in the `webpage/` folder. The page contains a short introduction, a logo, and direct links to downloads.
+
+Preview the website locally
+```bash
+cd webpage
+npm install
+npm start
+# open http://localhost:3000
+```
+
+Deploying to Cloudflare Pages (UI setup)
+If you want Cloudflare Pages to build the site from this repository (recommended):
+
+- Connect your GitHub repo and select branch: `main`
+- Build command: `cd webpage && npm ci && npm run build`
+- Build output directory (publish): `webpage/build`
+- Framework preset: None / Static
+
+Note: I removed any automatic GitHub Action that deploys to Cloudflare Pages — this repo is prepared for Cloudflare to build directly from the repository using the settings above.
+
 Privacy & Security
 - Transfers happen over your local network only. Files are not uploaded to any cloud service by the app.
 
@@ -100,4 +85,4 @@ License
 - MIT — see the `LICENSE` file in this repository for details.
 
 Thanks for trying Local Share!
-   ```bash
+1. Install the Android app from Releases (or your device's Play Store if published).
