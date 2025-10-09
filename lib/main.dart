@@ -779,11 +779,11 @@ class _ServerPageState extends State<ServerPage>
               Text(
                 globalServer.isRunning ? 'Server Running' : 'Server Stopped',
                 style: theme.textTheme.headlineSmall?.copyWith(
-                      color: globalServer.isRunning
-                          ? theme.colorScheme.primary
-                          : Colors.grey.shade600,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: globalServer.isRunning
+                      ? theme.colorScheme.primary
+                      : Colors.grey.shade600,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -1297,16 +1297,13 @@ class _ClientPageState extends State<ClientPage>
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color:
-                    _isError ? Colors.grey.shade300 : Colors.grey.shade200,
+                color: _isError ? Colors.grey.shade300 : Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   Icon(
-                    _isError
-                        ? Icons.error_outline
-                        : Icons.check_circle_outline,
+                    _isError ? Icons.error_outline : Icons.check_circle_outline,
                     color: Colors.black87,
                   ),
                   const SizedBox(width: 8),
