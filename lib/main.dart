@@ -45,7 +45,7 @@ class LocalShareApp extends StatelessWidget {
           fontSize: 18,
         ),
       ),
-      tabBarTheme: const TabBarThemeData(
+      tabBarTheme: const TabBarTheme(
         labelColor: Colors.black,
         unselectedLabelColor: Colors.grey,
         indicator: UnderlineTabIndicator(
@@ -57,7 +57,7 @@ class LocalShareApp extends StatelessWidget {
         ),
         unselectedLabelStyle: TextStyle(letterSpacing: 1.2),
       ),
-      cardTheme: const CardThemeData(
+      cardTheme: const CardTheme(
         color: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
