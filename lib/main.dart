@@ -48,15 +48,22 @@ class LocalShareApp extends StatelessWidget {
       tabBarTheme: const TabBarThemeData(
         labelColor: Colors.black,
         unselectedLabelColor: Colors.grey,
-        indicatorColor: Colors.black,
+        indicator: UnderlineTabIndicator(
+          borderSide: BorderSide(color: Colors.black, width: 2),
+        ),
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+        ),
+        unselectedLabelStyle: TextStyle(letterSpacing: 1.2),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         color: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Colors.black12),
+          borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

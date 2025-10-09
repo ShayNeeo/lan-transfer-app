@@ -77,7 +77,8 @@ class LANFileServer {
       final files = <Map<String, dynamic>>[];
 
       // Get path parameter for subfolder navigation (within uploadDir only)
-      final path = request.url.queryParameters['path'] ?? '';
+      final rawPath = request.url.queryParameters['path'] ?? '';
+      final path = rawPath.isEmpty ? '' : Uri.decodeComponent(rawPath);
       final targetPath = path.isEmpty
           ? uploadDir.path
           : p.normalize(p.join(uploadDir.path, path));
@@ -156,8 +157,9 @@ class LANFileServer {
   Future<shelf.Response> _handleDownload(
       shelf.Request request, String filename) async {
     try {
+      final decodedFilename = Uri.decodeComponent(filename);
       // Construct a safe absolute path within the upload directory
-      final safePath = p.normalize(p.join(uploadDir.path, filename));
+      final safePath = p.normalize(p.join(uploadDir.path, decodedFilename));
       if (!p.isWithin(uploadDir.path, safePath)) {
         return shelf.Response.forbidden('Access denied');
       }
@@ -169,7 +171,7 @@ class LANFileServer {
 
       final bytes = await file.readAsBytes();
       // Extract just the filename for Content-Disposition
-      final displayName = p.basename(filename);
+      final displayName = p.basename(decodedFilename);
       final mimeType =
           lookupMimeType(displayName) ?? 'application/octet-stream';
 
@@ -188,8 +190,10 @@ class LANFileServer {
   Future<shelf.Response> _handleFolderDownload(
       shelf.Request request, String folderpath) async {
     try {
+      final decodedFolderPath = Uri.decodeComponent(folderpath);
       // Construct a safe absolute path within the upload directory
-      final safeFolderPath = p.normalize(p.join(uploadDir.path, folderpath));
+      final safeFolderPath =
+          p.normalize(p.join(uploadDir.path, decodedFolderPath));
       if (!p.isWithin(uploadDir.path, safeFolderPath)) {
         return shelf.Response.forbidden('Access denied');
       }
@@ -237,7 +241,10 @@ class LANFileServer {
             body: 'Failed to create zip archive');
       }
 
-      final folderName = folderpath.split('/').last;
+      var folderName = decodedFolderPath.split('/').last;
+      if (folderName.isEmpty) {
+        folderName = 'folder';
+      }
       final timestamp = DateTime.now().millisecondsSinceEpoch;
 
       return shelf.Response.ok(
@@ -257,7 +264,8 @@ class LANFileServer {
   Future<shelf.Response> _handleDelete(
       shelf.Request request, String filename) async {
     try {
-      final safePath = p.normalize(p.join(uploadDir.path, filename));
+      final decodedFilename = Uri.decodeComponent(filename);
+      final safePath = p.normalize(p.join(uploadDir.path, decodedFilename));
 
       // Security check
       if (!p.isWithin(uploadDir.path, safePath)) {
@@ -359,7 +367,9 @@ class LANFileServer {
           continue;
         }
 
-        developer.log('Processing file: $filename');
+        final sanitizedFilename = filename.replaceAll('\\', '/');
+
+        developer.log('Processing file: $sanitizedFilename');
 
         // Find next boundary
         int dataStart = headersEnd + 4;
@@ -382,7 +392,7 @@ class LANFileServer {
 
         // Save file with binary data, creating directories if needed
         // Build a safe destination path within uploadDir
-        final destPath = p.normalize(p.join(uploadDir.path, filename));
+        final destPath = p.normalize(p.join(uploadDir.path, sanitizedFilename));
         if (!p.isWithin(uploadDir.path, destPath)) {
           developer.log('Skipping file outside upload directory: $filename');
           i = nextBoundaryIndex;
