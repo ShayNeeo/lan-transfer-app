@@ -467,63 +467,169 @@ class LANFileServer {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LAN File Transfer</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { text-align: center; color: white; margin-bottom: 30px; }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-        .upload-section h2, .files-section h2 { color: #667eea; margin-bottom: 20px; }
-        .upload-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .upload-btn:hover { transform: translateY(-2px); }
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .btn {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
-            font-weight: 500;
-        }
-        .download-btn { background: #4CAF50; color: white; }
-        .delete-btn { background: #f44336; color: white; }
-        .folder-item { background: #f8f9ff; border-left: 3px solid #667eea; margin-bottom: 4px; }
-        .folder-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; cursor: pointer; }
-        .folder-header:hover { background: #eef0ff; }
-        .folder-content { padding-left: 20px; background: #fff; display: none; border-left: 2px solid #e0e0e0; margin-left: 20px; }
-        .folder-content.expanded { display: block; }
-        .file-item-nested { padding: 8px 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .expand-icon { transition: transform 0.3s; display: inline-block; margin-right: 8px; }
-        .expand-icon.expanded { transform: rotate(90deg); }
-        .nested-folder { margin: 4px 0; border-left: 2px solid #ddd; background: #fafafa; }
-    </style>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Orbitron', 'Press Start 2P', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      min-height: 100vh;
+      padding: 24px;
+      color: #000000;
+    }
+    .container { max-width: 940px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 28px; text-transform: uppercase; letter-spacing: 2px; }
+    .header h1 { font-size: 2.4em; margin-bottom: 10px; }
+    .header p { font-size: 0.9em; color: #111111; }
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 32px 28px;
+      border: 2px solid #000000;
+      box-shadow: 8px 8px 0 #000000;
+      margin-bottom: 24px;
+    }
+    .upload-section h2, .files-section h2 {
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+    }
+    .upload-section label {
+      display: block;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      font-size: 0.75em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .upload-section input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #000000;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #000000;
+    }
+    .upload-section input[type="file"]::file-selector-button {
+      border: 2px solid #000000;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-right: 12px;
+      background: #ffffff;
+      color: #000000;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .upload-btn {
+      background: #000000;
+      color: #ffffff;
+      border: 2px solid #000000;
+      padding: 14px 36px;
+      font-size: 0.95em;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+    }
+    .upload-btn:hover {
+      transform: translateY(-3px);
+      background: #ffffff;
+      color: #000000;
+    }
+    #status {
+      margin-top: 18px;
+      min-height: 26px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    ul { list-style: none; }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #000000;
+    }
+    .btn {
+      padding: 10px 18px;
+      border: 2px solid #000000;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-left: 10px;
+      font-weight: 700;
+      background: #ffffff;
+      color: #000000;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .download-btn { background: #ffffff; color: #000000; }
+    .delete-btn { background: #000000; color: #ffffff; }
+    .folder-item {
+      background: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 16px;
+      margin-bottom: 12px;
+      box-shadow: 6px 6px 0 #000000;
+    }
+    .folder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      cursor: pointer;
+    }
+    .folder-header:hover { background: #f5f5f5; }
+    .folder-content {
+      padding-left: 20px;
+      padding-right: 18px;
+      padding-bottom: 14px;
+      background: #ffffff;
+      display: none;
+      border-top: 2px solid #000000;
+      margin-left: 0;
+      border-left: none;
+    }
+    .folder-content.expanded { display: block; }
+    .file-item-nested {
+      padding: 10px 14px;
+      border-bottom: 1px solid #000000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .file-item-nested:last-child { border-bottom: none; }
+    .expand-icon { transition: transform 0.3s; display: inline-block; margin-right: 8px; }
+    .expand-icon.expanded { transform: rotate(90deg); }
+    .nested-folder {
+      margin: 8px 0;
+      border-left: none;
+      background: #ffffff;
+      border: 2px solid #000000;
+      border-radius: 14px;
+      box-shadow: 4px 4px 0 #000000;
+    }
+    .nested-folder .folder-header { padding: 12px 16px; }
+    .nested-folder .folder-content { padding-left: 16px; padding-right: 16px; }
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #555555;
+      font-style: italic;
+    }
+    @media (max-width: 640px) {
+      body { padding: 16px; }
+      .card { padding: 24px 18px; box-shadow: 6px 6px 0 #000000; }
+      .btn { width: 100%; margin-left: 0; margin-top: 8px; }
+    }
+  </style>
 </head>
 <body>
     <div class="container">
@@ -536,11 +642,11 @@ class LANFileServer {
             <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 200px;">
                     <label for="fileInput" style="display: block; margin-bottom: 5px; font-weight: 600;">📄 Select Files</label>
-                    <input type="file" id="fileInput" multiple style="width: 100%; padding: 10px; border: 2px solid #667eea; border-radius: 5px;">
+          <input type="file" id="fileInput" multiple>
                 </div>
                 <div style="flex: 1; min-width: 200px;">
                     <label for="folderInput" style="display: block; margin-bottom: 5px; font-weight: 600;">📁 Select Folder(s)</label>
-                    <input type="file" id="folderInput" webkitdirectory directory multiple style="width: 100%; padding: 10px; border: 2px solid #667eea; border-radius: 5px;">
+          <input type="file" id="folderInput" webkitdirectory directory multiple>
                 </div>
             </div>
             <button class="upload-btn" onclick="uploadFiles()">Upload</button>

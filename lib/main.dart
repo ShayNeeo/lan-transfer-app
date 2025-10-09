@@ -12,6 +12,7 @@ import 'package:path/path.dart' as p;
 
 // Global server instance that persists across tab changes
 final globalServer = LANFileServer(port: 8000);
+const _logoAssetPath = 'favicon_io/android-chrome-192x192.png';
 
 void main() {
   runApp(const LocalShareApp());
@@ -22,23 +23,94 @@ class LocalShareApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeData(
+      useMaterial3: true,
+      colorScheme: const ColorScheme.light(
+        primary: Colors.black,
+        onPrimary: Colors.white,
+        secondary: Colors.black,
+        onSecondary: Colors.white,
+        surface: Colors.white,
+        onSurface: Colors.black,
+        background: Colors.white,
+        onBackground: Colors.black,
+      ),
+      scaffoldBackgroundColor: Colors.white,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w700,
+          fontSize: 18,
+        ),
+      ),
+      tabBarTheme: const TabBarTheme(
+        labelColor: Colors.black,
+        unselectedLabelColor: Colors.grey,
+        indicatorColor: Colors.black,
+      ),
+      cardTheme: CardTheme(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Colors.black12),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+      ),
+      iconTheme: const IconThemeData(color: Colors.black),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: Colors.black,
+        contentTextStyle: TextStyle(color: Colors.white),
+        behavior: SnackBarBehavior.floating,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black26),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black26),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.black),
+        ),
+        labelStyle: const TextStyle(color: Colors.black87),
+        hintStyle: const TextStyle(color: Colors.black45),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.black,
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+
     return MaterialApp(
       title: 'Local Share',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF667EEA),
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF667EEA),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      themeMode: ThemeMode.system,
+      theme: theme,
+      darkTheme: theme,
+      themeMode: ThemeMode.light,
       home: const HomePage(),
     );
   }
@@ -69,10 +141,32 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('📁 Local Share'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        titleSpacing: 16,
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                _logoAssetPath,
+                height: 32,
+                width: 32,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Local Share',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: false,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -276,7 +370,7 @@ class _ServerPageState extends State<ServerPage>
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: Colors.black87),
             child: const Text('Delete'),
           ),
         ],
@@ -433,7 +527,7 @@ class _ServerPageState extends State<ServerPage>
           ListTile(
             leading: Icon(
               isExpanded ? Icons.folder_open : Icons.folder,
-              color: Colors.amber,
+              color: Colors.black87,
               size: 32,
             ),
             title: Text(
@@ -449,8 +543,9 @@ class _ServerPageState extends State<ServerPage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon:
-                      Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                  icon: Icon(
+                    isExpanded ? Icons.expand_less : Icons.expand_more,
+                  ),
                   onPressed: () async {
                     if (isExpanded) {
                       setState(() {
@@ -466,12 +561,18 @@ class _ServerPageState extends State<ServerPage>
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.download, color: Colors.green),
+                  icon: Icon(
+                    Icons.download,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   onPressed: () => _downloadFolder(folder.path),
                   tooltip: 'Download folder as ZIP',
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.black87,
+                  ),
                   onPressed: () => _deleteServerFile(folder.path),
                 ),
               ],
@@ -515,7 +616,7 @@ class _ServerPageState extends State<ServerPage>
         title: Text(file.name),
         subtitle: Text(file.size),
         trailing: IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
+          icon: const Icon(Icons.delete, color: Colors.black87),
           onPressed: () => _deleteServerFile(file.path),
         ),
         onTap: () => _openFile(file.path),
@@ -533,7 +634,7 @@ class _ServerPageState extends State<ServerPage>
           contentPadding: EdgeInsets.only(left: 16.0 * (depth + 1), right: 16),
           leading: Icon(
             isExpanded ? Icons.folder_open : Icons.folder,
-            color: Colors.amber,
+            color: Colors.black87,
             size: 24,
           ),
           title: Text(folder.name,
@@ -568,12 +669,16 @@ class _ServerPageState extends State<ServerPage>
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.download, color: Colors.green, size: 20),
+                icon: Icon(
+                  Icons.download,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
                 onPressed: () => _downloadFolder(folder.path),
                 tooltip: 'Download folder as ZIP',
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                icon: const Icon(Icons.delete, color: Colors.black87, size: 20),
                 onPressed: () => _deleteServerFile(folder.path),
               ),
             ],
@@ -609,7 +714,7 @@ class _ServerPageState extends State<ServerPage>
       title: Text(file.name, style: const TextStyle(fontSize: 14)),
       subtitle: Text(file.size, style: const TextStyle(fontSize: 12)),
       trailing: IconButton(
-        icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+        icon: const Icon(Icons.delete, color: Colors.black87, size: 20),
         onPressed: () => _deleteServerFile(file.path),
       ),
       onTap: () => _openFile(file.path),
@@ -655,6 +760,7 @@ class _ServerPageState extends State<ServerPage>
   @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveStateMixin
+    final theme = Theme.of(context);
     return Column(
       children: [
         // Server Status Header
@@ -665,14 +771,17 @@ class _ServerPageState extends State<ServerPage>
               Icon(
                 globalServer.isRunning ? Icons.router : Icons.router_outlined,
                 size: 60,
-                color: globalServer.isRunning ? Colors.green : Colors.grey,
+                color: globalServer.isRunning
+                    ? theme.colorScheme.primary
+                    : Colors.grey.shade500,
               ),
               const SizedBox(height: 12),
               Text(
                 globalServer.isRunning ? 'Server Running' : 'Server Stopped',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color:
-                          globalServer.isRunning ? Colors.green : Colors.grey,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                      color: globalServer.isRunning
+                          ? theme.colorScheme.primary
+                          : Colors.grey.shade600,
                       fontWeight: FontWeight.bold,
                     ),
               ),
@@ -694,7 +803,7 @@ class _ServerPageState extends State<ServerPage>
                           'http://$_serverIp:8000',
                           style: const TextStyle(
                             fontSize: 18,
-                            color: Color(0xFF667EEA),
+                            color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -725,12 +834,13 @@ class _ServerPageState extends State<ServerPage>
                           : 'Start Server'),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   backgroundColor: globalServer.isRunning
-                      ? Colors.red
-                      : const Color(0xFF667EEA),
-                  foregroundColor: Colors.white,
+                      ? theme.colorScheme.surface
+                      : theme.colorScheme.primary,
+                  foregroundColor: globalServer.isRunning
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onPrimary,
+                  side: BorderSide(color: theme.colorScheme.primary),
                 ),
               ),
             ],
@@ -819,7 +929,7 @@ class _ServerPageState extends State<ServerPage>
                       children: [
                         Icon(
                           Icons.info_outline,
-                          color: Colors.blue.shade300,
+                          color: Colors.grey.shade600,
                           size: 60,
                         ),
                         const SizedBox(height: 16),
@@ -1147,6 +1257,7 @@ class _ClientPageState extends State<ClientPage>
   @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveStateMixin
+    final theme = Theme.of(context);
     return Scaffold(
       body: Column(
         children: [
@@ -1170,6 +1281,10 @@ class _ClientPageState extends State<ClientPage>
                 IconButton.filled(
                   onPressed: _loadFiles,
                   icon: const Icon(Icons.refresh),
+                  style: IconButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                  ),
                   tooltip: 'Refresh',
                 ),
               ],
@@ -1182,24 +1297,24 @@ class _ClientPageState extends State<ClientPage>
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isError ? Colors.red.shade100 : Colors.green.shade100,
+                color:
+                    _isError ? Colors.grey.shade300 : Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   Icon(
-                    _isError ? Icons.error : Icons.check_circle,
-                    color:
-                        _isError ? Colors.red.shade700 : Colors.green.shade700,
+                    _isError
+                        ? Icons.error_outline
+                        : Icons.check_circle_outline,
+                    color: Colors.black87,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _statusMessage!,
                       style: TextStyle(
-                        color: _isError
-                            ? Colors.red.shade700
-                            : Colors.green.shade700,
+                        color: Colors.black87,
                       ),
                     ),
                   ),
@@ -1265,12 +1380,12 @@ class _ClientPageState extends State<ClientPage>
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.download),
-                                    color: Colors.green,
+                                    color: theme.colorScheme.primary,
                                     onPressed: () => _downloadFile(file.name),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete),
-                                    color: Colors.red,
+                                    color: Colors.black87,
                                     onPressed: () => _deleteFile(file.name),
                                   ),
                                 ],
@@ -1290,6 +1405,8 @@ class _ClientPageState extends State<ClientPage>
             heroTag: 'upload_files',
             icon: const Icon(Icons.upload_file),
             label: const Text('Upload Files'),
+            foregroundColor: theme.colorScheme.onPrimary,
+            backgroundColor: theme.colorScheme.primary,
           ),
           const SizedBox(height: 12),
           FloatingActionButton.extended(
@@ -1297,7 +1414,8 @@ class _ClientPageState extends State<ClientPage>
             heroTag: 'upload_folder',
             icon: const Icon(Icons.folder_open),
             label: const Text('Upload Folder'),
-            backgroundColor: Colors.deepPurple,
+            foregroundColor: theme.colorScheme.primary,
+            backgroundColor: theme.colorScheme.surface,
           ),
         ],
       ),
