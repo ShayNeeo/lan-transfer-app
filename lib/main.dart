@@ -32,8 +32,6 @@ class LocalShareApp extends StatelessWidget {
         onSecondary: Colors.white,
         surface: Colors.white,
         onSurface: Colors.black,
-        background: Colors.white,
-        onBackground: Colors.black,
       ),
       scaffoldBackgroundColor: Colors.white,
       appBarTheme: const AppBarTheme(
@@ -47,12 +45,12 @@ class LocalShareApp extends StatelessWidget {
           fontSize: 18,
         ),
       ),
-      tabBarTheme: const TabBarTheme(
+      tabBarTheme: const TabBarThemeData(
         labelColor: Colors.black,
         unselectedLabelColor: Colors.grey,
         indicatorColor: Colors.black,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -569,7 +567,7 @@ class _ServerPageState extends State<ServerPage>
                   tooltip: 'Download folder as ZIP',
                 ),
                 IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.delete,
                     color: Colors.black87,
                   ),
@@ -1310,7 +1308,7 @@ class _ClientPageState extends State<ClientPage>
                   Expanded(
                     child: Text(
                       _statusMessage!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black87,
                       ),
                     ),
