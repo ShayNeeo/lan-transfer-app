@@ -23,7 +23,7 @@ class LocalShareApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeData(
+    final baseTheme = ThemeData(
       useMaterial3: true,
       colorScheme: const ColorScheme.light(
         primary: Colors.black,
@@ -108,6 +108,30 @@ class LocalShareApp extends StatelessWidget {
           foregroundColor: Colors.black,
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
+      ),
+    );
+
+    final theme = baseTheme.copyWith(
+      tabBarTheme: baseTheme.tabBarTheme.copyWith(
+        labelColor: Colors.black,
+        unselectedLabelColor: Colors.grey,
+        indicator: const UnderlineTabIndicator(
+          borderSide: BorderSide(color: Colors.black, width: 2),
+        ),
+        labelStyle: const TextStyle(
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+        ),
+        unselectedLabelStyle: const TextStyle(letterSpacing: 1.2),
+      ),
+      cardTheme: baseTheme.cardTheme.copyWith(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Colors.black12, width: 2),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
     );
 
